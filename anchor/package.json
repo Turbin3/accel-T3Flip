@@ -15,7 +15,7 @@
     "setup": "npm run anchor keys sync && npm run codama:js",
     "start": "next start"
   },
-  "displayName": "T3 Flip",
+  "displayName": "Fullstack Boilerplate",
   "description": "Next.js, Tailwind, basic Anchor example, gill (based on @solana/kit), Wallet UI",
   "usecase": "Starter",
   "keywords": [
