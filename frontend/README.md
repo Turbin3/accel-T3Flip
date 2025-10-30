@@ -1,10 +1,36 @@
-# Q4_Accel_Grp_2_Project
+# Frontend
 
+This frontend is based on the solana-react-dapp template with nextjs, tailwind, wallet-ui, and codama.js
 
 #### Commands
 
 You can use any normal anchor commands. Either move to the `anchor` directory and run the `anchor` command or prefix the
 command with `npm run`, eg: `npm run anchor`.
+
+### web
+
+This is a React app that uses the Anchor generated client to interact with the Solana program.
+
+#### Commands
+
+Install dependencies
+
+```shell
+npm install
+```
+
+Start the app
+
+```shell
+npm run dev
+```
+
+Build the app
+
+```shell
+npm run build
+```
+
 
 #### Sync the program id:
 
@@ -40,20 +66,3 @@ npm run anchor-test
 npm run anchor deploy --provider.cluster devnet
 ```
 
-### web
-
-This is a React app that uses the Anchor generated client to interact with the Solana program.
-
-#### Commands
-
-Start the app
-
-```shell
-npm run dev
-```
-
-Build the app
-
-```shell
-npm run build
-```
