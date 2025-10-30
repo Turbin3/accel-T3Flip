@@ -1,5 +1,7 @@
-import DashboardFeature from '@/features/dashboard/dashboard-feature'
+'use client'
+
+import GameFeature from '@/features/game/game-feature'
 
 export default function Home() {
-  return <DashboardFeature />
+  return <GameFeature />
 }
