@@ -52,4 +52,4 @@ test-ledger
 target/
 **/*.rs.bk
 
-/.DS_Store
+package-lock.json
