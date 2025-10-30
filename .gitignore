@@ -53,3 +53,6 @@ target/
 **/*.rs.bk
 
 package-lock.json
+
+# Generated client code
+/anchor/src/t3flip/client/js/generated/
