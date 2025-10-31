@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use ephemeral_rollups_sdk::anchor::delegate;
+use ephemeral_rollups_sdk::{anchor::delegate, cpi::DelegateConfig};
 
 use crate::GameState;
 
@@ -24,6 +24,20 @@ pub struct Delegate<'info> {
 
 impl Delegate<'_> {
     pub fn delegate(&mut self) -> Result<()> {
+        let seed_bytes = self.game_state.current_game_id.to_le_bytes();
+        let player_seed = self.player.key();
+
+        let seeds = &[b"game_state", seed_bytes.as_ref(), player_seed.as_ref()];
+
+        self.delegate_game_state(
+            &self.player,
+            seeds,
+            DelegateConfig {
+                validator: Some(self.validator.key()),
+                ..Default::default()
+            },
+        )?;
+
         Ok(())
     }
 }
