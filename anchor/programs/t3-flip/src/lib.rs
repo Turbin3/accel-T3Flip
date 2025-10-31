@@ -27,7 +27,8 @@ pub mod t3_flip {
         ctx.accounts.game_over()
     }
 
-    pub fn vrf_callback(ctx: Context<VrfCallback>, rnd: u64) -> Result<()> {
+    pub fn vrf_callback(ctx: Context<VrfCallback>, rnd: [u8; 32]) -> Result<()> {
+        let rnd = ephemeral_vrf_sdk::rnd::random_u64(&rnd);
         ctx.accounts.update_game_state(rnd)
     }
 }

@@ -1,9 +1,13 @@
 use anchor_lang::prelude::*;
-use ephemeral_rollups_sdk::{anchor::delegate, cpi::DelegateConfig};
+use ephemeral_vrf_sdk::{
+    anchor::vrf,
+    instructions::{create_request_randomness_ix, RequestRandomnessParams},
+    types::SerializableAccountMeta,
+};
 
-use crate::GameState;
+use crate::{instruction, GameState};
 
-#[delegate]
+#[vrf]
 #[derive(Accounts)]
 #[instruction(seed: u64)]
 pub struct Initialize<'info> {
@@ -12,7 +16,6 @@ pub struct Initialize<'info> {
 
     #[account(
         init,
-        del,
         payer=player,
         seeds = [b"game_state", seed.to_le_bytes().as_ref(), player.key().as_ref()],
         space = 8 + GameState::INIT_SPACE,
@@ -20,8 +23,12 @@ pub struct Initialize<'info> {
     )]
     pub game_state: Account<'info, GameState>,
 
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    pub validator: UncheckedAccount<'info>,
+    /// CHECK: The oracle queue
+    #[account(
+        mut,
+        address = ephemeral_vrf_sdk::consts::DEFAULT_EPHEMERAL_QUEUE
+    )]
+    pub oracle_queue: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
 }
 
@@ -43,19 +50,21 @@ impl Initialize<'_> {
             is_active: true,
         });
 
-        let seed_bytes = seed.to_le_bytes();
-        let player_bytes = seed.to_le_bytes();
+        let ixn = create_request_randomness_ix(RequestRandomnessParams {
+            payer: self.player.key(),
+            oracle_queue: self.oracle_queue.key(),
+            callback_program_id: crate::ID,
+            callback_discriminator: instruction::VrfCallback::DISCRIMINATOR.to_vec(),
+            accounts_metas: Some(vec![SerializableAccountMeta {
+                pubkey: self.game_state.key(),
+                is_signer: false,
+                is_writable: true,
+            }]),
+            caller_seed: [seed as u8; 32],
+            ..Default::default()
+        });
 
-        let seeds = &[b"game_state", seed_bytes.as_ref(), player_bytes.as_ref()];
-
-        self.delegate_game_state(
-            &self.player,
-            seeds,
-            DelegateConfig {
-                validator: Some(self.validator.key()),
-                ..Default::default()
-            },
-        )?;
+        self.invoke_signed_vrf(&self.player.to_account_info(), &ixn)?;
 
         Ok(())
     }
