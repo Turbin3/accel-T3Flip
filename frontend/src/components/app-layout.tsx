@@ -17,17 +17,19 @@ export function AppLayout({
 }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-background">
         <AppHeader links={links} />
-        <main className="flex-grow container mx-auto p-4">
+        <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
           <ClusterUiChecker>
             <AccountUiChecker />
           </ClusterUiChecker>
-          {children}
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {children}
+          </div>
         </main>
         <AppFooter />
       </div>
-      <Toaster closeButton />
+      <Toaster closeButton position="top-right" richColors />
     </ThemeProvider>
   )
 }

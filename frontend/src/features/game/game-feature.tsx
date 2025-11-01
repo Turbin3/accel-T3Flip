@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Loader2, PlayCircle, RotateCcw, Trophy, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 import { GameState, MOCK_PERSONS, Person, Card as CardType } from './types/game-types'
 import { GameCard } from './ui/game-card'
 import { HintsSection } from './ui/hints-section'
@@ -144,40 +145,57 @@ export default function GameFeature() {
   const lives = gameState.maxErrors - gameState.errors
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-8 max-w-7xl mx-auto">
       {/* Game Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Card Guessing Game</h1>
-          <p className="text-muted-foreground">
-            Match the famous technologists with their cards
-          </p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-12 bg-gradient-to-b from-primary to-primary/50 rounded-full" />
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+                Card Guessing Game
+              </h1>
+              <p className="text-muted-foreground mt-1 text-base md:text-lg">
+                Match the famous technologists with their cards
+              </p>
+            </div>
+          </div>
         </div>
         {gameState.isStarted && (
-          <GameStats
-            errors={gameState.errors}
-            maxErrors={gameState.maxErrors}
-            lives={lives}
-          />
+          <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+            <GameStats
+              errors={gameState.errors}
+              maxErrors={gameState.maxErrors}
+              lives={lives}
+            />
+          </div>
         )}
       </div>
 
       {/* Cards Section */}
-      <div className="grid grid-cols-5 gap-3">
-        {gameState.cards.map((card, index) => {
-          const person = gameState.availablePersons.find(
-            (p) => p.id === card.personId
-          )
-          return (
-            <GameCard
-              key={card.id}
-              card={card}
-              person={person}
-              isActive={index === gameState.currentCardIndex}
-              cardNumber={index + 1}
-            />
-          )
-        })}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold text-muted-foreground">Game Cards</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          {gameState.cards.map((card, index) => {
+            const person = gameState.availablePersons.find(
+              (p) => p.id === card.personId
+            )
+            return (
+              <div
+                key={card.id}
+                className="animate-in fade-in slide-in-from-bottom-4"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <GameCard
+                  card={card}
+                  person={person}
+                  isActive={index === gameState.currentCardIndex}
+                  cardNumber={index + 1}
+                />
+              </div>
+            )
+          })}
+        </div>
       </div>
 
       {/* Hints Section */}
@@ -187,29 +205,52 @@ export default function GameFeature() {
 
       {/* Game Complete Messages */}
       {gameState.isComplete && (
-        <Card className={gameState.isWon ? 'border-green-500' : 'border-destructive'}>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
+        <Card 
+          className={cn(
+            "border-2 shadow-2xl animate-in zoom-in duration-500",
+            gameState.isWon 
+              ? 'bg-gradient-to-br from-green-500/10 via-emerald-500/5 to-green-500/10 border-green-500/50' 
+              : 'bg-gradient-to-br from-destructive/10 via-red-500/5 to-destructive/10 border-destructive/50'
+          )}
+        >
+          <CardContent className="p-8">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
               {gameState.isWon ? (
                 <>
-                  <Trophy className="w-8 h-8 text-green-500" />
-                  <div>
-                    <h3 className="text-xl font-bold text-green-500">
-                      Congratulations! You Won!
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-green-500/20 rounded-full blur-2xl animate-pulse" />
+                    <Trophy className="relative w-16 h-16 text-green-500 drop-shadow-lg animate-bounce" />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                      Congratulations! You Won! 🎉
                     </h3>
-                    <p className="text-muted-foreground">
-                      You guessed all the cards correctly!
+                    <p className="text-base text-muted-foreground">
+                      You successfully guessed all the cards correctly! Well done!
                     </p>
+                    <div className="flex items-center justify-center sm:justify-start gap-2 pt-2">
+                      <span className="text-sm font-semibold text-green-600">
+                        Final Score: {gameState.cards.length} cards • {gameState.maxErrors - gameState.errors} lives remaining
+                      </span>
+                    </div>
                   </div>
                 </>
               ) : (
                 <>
-                  <XCircle className="w-8 h-8 text-destructive" />
-                  <div>
-                    <h3 className="text-xl font-bold text-destructive">Game Over</h3>
-                    <p className="text-muted-foreground">
-                      You ran out of lives. Better luck next time!
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-destructive/20 rounded-full blur-2xl" />
+                    <XCircle className="relative w-16 h-16 text-destructive drop-shadow-lg" />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <h3 className="text-3xl font-bold text-destructive">Game Over</h3>
+                    <p className="text-base text-muted-foreground">
+                      You ran out of lives. Don't worry, you can try again!
                     </p>
+                    <div className="flex items-center justify-center sm:justify-start gap-2 pt-2">
+                      <span className="text-sm font-semibold text-muted-foreground">
+                        Cards guessed: {gameState.cards.filter(c => c.isGuessed).length}/{gameState.cards.length}
+                      </span>
+                    </div>
                   </div>
                 </>
               )}
@@ -228,14 +269,14 @@ export default function GameFeature() {
       )}
 
       {/* Action Buttons */}
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         {!gameState.isStarted && (
           <Button
             onClick={handleStartGame}
             size="lg"
-            className="gap-2"
+            className="gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
           >
-            <PlayCircle className="w-4 h-4" />
+            <PlayCircle className="w-5 h-5" />
             Start Game
           </Button>
         )}
@@ -245,9 +286,9 @@ export default function GameFeature() {
             onClick={handleReset}
             variant="outline"
             size="lg"
-            className="gap-2"
+            className="gap-2 border-2 hover:bg-accent hover:scale-105 transition-all duration-300"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-5 h-5" />
             New Game
           </Button>
         )}
