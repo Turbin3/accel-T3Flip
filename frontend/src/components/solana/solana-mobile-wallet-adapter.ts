@@ -1,5 +1,7 @@
 'use client'
 
+declare const window: any;
+
 import { SolanaCluster } from '@wallet-ui/react'
 import {
   createDefaultAuthorizationCache,

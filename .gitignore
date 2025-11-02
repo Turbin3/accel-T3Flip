@@ -41,6 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 # Anchor
+# Anchor
 /anchor/.anchor
 /anchor/target/debug
 /anchor/target/deploy
@@ -48,11 +49,18 @@ next-env.d.ts
 /anchor/target/sbf-solana-solana
 /anchor/target/test-ledger
 /anchor/target/.rustc_info.json
+/target/
 test-ledger
-target/
 **/*.rs.bk
+
+# Ignore all target directories
+target/
+anchor/target/*
+
+# But keep these anchor target subdirectories
+!anchor/target/idl/
+!anchor/target/types/
 
 package-lock.json
 
-# Generated client code
 /anchor/src/t3flip/client/js/generated/

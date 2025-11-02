@@ -1,14 +1,20 @@
-{
-  "address": "69bDTx8B9AEGkUDWiHufnzvx69HYhGtSsgJ7KuDrZiWL",
+/**
+ * Program IDL in camelCase format in order to be used in JS/TS.
+ *
+ * Note that this is only a type helper and is not the actual IDL. The original
+ * IDL can be found at `target/idl/t3_flip.json`.
+ */
+export type T3Flip = {
+  "address": "ALBrSaQ89ntEGMDxj1idPdPVeHkFtfkjEkLpns1EvJTu",
   "metadata": {
-    "name": "t3_flip",
+    "name": "t3Flip",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
   "instructions": [
     {
-      "name": "game_over",
+      "name": "gameOver",
       "discriminator": [
         91,
         212,
@@ -26,7 +32,7 @@
           "signer": true
         },
         {
-          "name": "game_state",
+          "name": "gameState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -48,7 +54,7 @@
               {
                 "kind": "account",
                 "path": "game_state.current_game_id",
-                "account": "GameState"
+                "account": "gameState"
               },
               {
                 "kind": "account",
@@ -58,7 +64,7 @@
           }
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
@@ -83,7 +89,7 @@
           "signer": true
         },
         {
-          "name": "game_state",
+          "name": "gameState",
           "pda": {
             "seeds": [
               {
@@ -104,7 +110,7 @@
               {
                 "kind": "account",
                 "path": "game_state.current_game_id",
-                "account": "GameState"
+                "account": "gameState"
               },
               {
                 "kind": "account",
@@ -114,13 +120,13 @@
           }
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "nft_id",
+          "name": "nftId",
           "type": "u8"
         }
       ]
@@ -144,7 +150,7 @@
           "signer": true
         },
         {
-          "name": "game_state",
+          "name": "gameState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -175,16 +181,16 @@
           }
         },
         {
-          "name": "oracle_queue",
+          "name": "oracleQueue",
           "writable": true,
           "address": "5hBR571xnXppuCPveTrctfTU7tJLSN94nq7kv7FRK5Tc"
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "program_identity",
+          "name": "programIdentity",
           "pda": {
             "seeds": [
               {
@@ -204,11 +210,11 @@
           }
         },
         {
-          "name": "vrf_program",
+          "name": "vrfProgram",
           "address": "Vrf1RNUjXmQGjmQrQLvJHs9SNkvDJEsRVFPkfSQUwGz"
         },
         {
-          "name": "slot_hashes",
+          "name": "slotHashes",
           "address": "SysvarS1otHashes111111111111111111111111111"
         }
       ],
@@ -220,7 +226,7 @@
       ]
     },
     {
-      "name": "vrf_callback",
+      "name": "vrfCallback",
       "discriminator": [
         248,
         224,
@@ -233,12 +239,12 @@
       ],
       "accounts": [
         {
-          "name": "vrf_program_identity",
+          "name": "vrfProgramIdentity",
           "signer": true,
           "address": "9irBy75QS2BN81FUgXuHcjqceJJRuc9oDkAe8TKVvvAw"
         },
         {
-          "name": "game_state",
+          "name": "gameState",
           "writable": true
         }
       ],
@@ -257,7 +263,7 @@
   ],
   "accounts": [
     {
-      "name": "GameState",
+      "name": "gameState",
       "discriminator": [
         144,
         94,
@@ -273,18 +279,18 @@
   "errors": [
     {
       "code": 6000,
-      "name": "CustomError",
+      "name": "customError",
       "msg": "Custom error message"
     }
   ],
   "types": [
     {
-      "name": "GameState",
+      "name": "gameState",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "current_game_id",
+            "name": "currentGameId",
             "type": "u64"
           },
           {
@@ -292,7 +298,7 @@
             "type": "bytes"
           },
           {
-            "name": "nfts_rewards",
+            "name": "nftsRewards",
             "type": "bytes"
           },
           {
@@ -304,7 +310,7 @@
             "type": "u8"
           },
           {
-            "name": "is_active",
+            "name": "isActive",
             "type": "bool"
           }
         ]
@@ -313,9 +319,9 @@
   ],
   "constants": [
     {
-      "name": "SEED",
+      "name": "seed",
       "type": "string",
       "value": "\"anchor\""
     }
   ]
-}
+};
