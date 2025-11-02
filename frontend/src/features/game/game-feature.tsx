@@ -144,8 +144,12 @@ export default function GameFeature() {
 
   const lives = gameState.maxErrors - gameState.errors
 
+  const guessedCount = gameState.cards.filter(c => c.isGuessed).length
+  const totalCards = gameState.cards.length
+  const progressPercentage = gameState.isStarted ? (guessedCount / totalCards) * 100 : 0
+
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 md:space-y-8 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Game Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div className="space-y-2">
@@ -172,10 +176,41 @@ export default function GameFeature() {
         )}
       </div>
 
+      {/* Progress Bar */}
+      {gameState.isStarted && !gameState.isComplete && (
+        <Card className="bg-gradient-to-br from-card to-card/80 border-2 overflow-hidden">
+          <CardContent className="p-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium text-muted-foreground">Progress</span>
+                <span className="font-semibold text-foreground">
+                  {guessedCount} / {totalCards} cards
+                </span>
+              </div>
+              <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${progressPercentage}%` }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Cards Section */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-muted-foreground">Game Cards</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+      <div className="space-y-3 md:space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <h2 className="text-lg md:text-xl font-semibold text-muted-foreground">Game Cards</h2>
+          {gameState.isStarted && (
+            <span className="text-xs sm:text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
+              Card {gameState.currentCardIndex + 1} of {totalCards}
+            </span>
+          )}
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
           {gameState.cards.map((card, index) => {
             const person = gameState.availablePersons.find(
               (p) => p.id === card.personId

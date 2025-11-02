@@ -185,6 +185,15 @@
     }
   }
 
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
   .animate-in {
     animation: fade-in 0.5s ease-out;
   }
@@ -207,6 +216,10 @@
 
   .zoom-in {
     animation: zoom-in 0.5s ease-out;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
   }
 }
 

@@ -19,7 +19,7 @@ export function AppLayout({
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <div className="flex flex-col min-h-screen bg-background">
         <AppHeader links={links} />
-        <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
+        <main className="flex-grow container mx-auto px-4 py-6 md:py-10 lg:py-12">
           <ClusterUiChecker>
             <AccountUiChecker />
           </ClusterUiChecker>
