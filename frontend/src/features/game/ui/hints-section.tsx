@@ -10,11 +10,11 @@ interface HintsSectionProps {
 export function HintsSection({ person }: HintsSectionProps) {
   if (!person) {
     return (
-      <Card className="border-dashed bg-gradient-to-br from-muted/30 to-muted/10">
+      <Card className="border-dashed border-transparent bg-gradient-to-br from-muted/30 to-muted/10">
         <CardContent className="p-6">
           <div className="flex items-center justify-center gap-2 text-muted-foreground">
             <Lightbulb className="w-4 h-4" />
-            <p className="text-sm">Start the game to see hints</p>
+            <p className="text-sm font-sans">Start the game to see hints</p>
           </div>
         </CardContent>
       </Card>
@@ -22,13 +22,13 @@ export function HintsSection({ person }: HintsSectionProps) {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-primary/20 shadow-lg">
-      <CardHeader className="pb-3">
+    <Card className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-transparent shadow-lg">
+      <CardHeader className="pb-3 border-b-0 border-transparent">
         <div className="flex items-center gap-2">
           <div className="p-2 rounded-lg bg-primary/10">
             <Lightbulb className="w-5 h-5 text-primary" />
           </div>
-          <CardTitle className="text-lg">Hints</CardTitle>
+          <CardTitle className="text-lg font-sans">Hints</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="pt-0">
@@ -45,9 +45,9 @@ export function HintsSection({ person }: HintsSectionProps) {
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
-                <span className="text-xs font-bold text-primary">{index + 1}</span>
+                <span className="text-xs font-bold text-primary font-sans">{index + 1}</span>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+              <p className="text-sm text-muted-foreground leading-relaxed flex-1 font-sans">
                 {hint}
               </p>
             </div>
