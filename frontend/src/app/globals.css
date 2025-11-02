@@ -2,6 +2,16 @@
 @import 'tw-animate-css';
 @import '@wallet-ui/tailwind/index.css';
 
+/* BoldPixels Font */
+@font-face {
+  font-family: 'BoldPixels';
+  src: url('/fonts/BoldPixels.ttf') format('truetype'),
+       url('/fonts/BoldPixels.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -119,6 +129,11 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-family: 'BoldPixels', monospace;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'BoldPixels', monospace;
   }
 
   button:not(:disabled),
