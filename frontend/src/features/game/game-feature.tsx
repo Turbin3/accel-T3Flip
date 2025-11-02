@@ -1,7 +1,9 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { AppHero } from '@/components/app-hero'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Wallet } from 'lucide-react'
 import { Loader2, PlayCircle, RotateCcw, Trophy, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -10,6 +12,13 @@ import { GameCard } from './ui/game-card'
 import { HintsSection } from './ui/hints-section'
 import { AnswerOptions } from './ui/answer-options'
 import { GameStats } from './ui/game-stats'
+
+import { useSolana } from '@/components/solana/use-solana'
+import { WalletDropdown } from '@/components/wallet-dropdown'
+
+import { useT3FlipAccountsQuery } from '@/features/game/data-access/use-t3flip-accounts-query'
+import { useT3FlipInitializeMutation } from '@/features/game/data-access/use-t3flip-initialize-mutation'
+
 
 function shuffleArray<T>(array: T[]): T[] {
   const newArray = [...array]
@@ -48,6 +57,44 @@ function createInitialGameState(): GameState {
 
 
 export default function GameFeature() {
+  const { account } = useSolana()
+
+  if (!account) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <AppHero 
+          title="Connect Your Wallet" 
+          subtitle="Please connect your Solana wallet to interact with the T3Flip program"
+        >
+          <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <Card className="bg-gradient-to-br from-card to-card/80 border-2 shadow-xl">
+              <CardContent className="p-8">
+                <div className="flex flex-col items-center gap-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl" />
+                    <div className="relative p-6 rounded-full bg-primary/10">
+                      <Wallet className="w-12 h-12 text-primary" />
+                    </div>
+                  </div>
+                  <div className="text-center space-y-2">
+                    <h3 className="text-2xl font-bold">Get Started</h3>
+                    <p className="text-muted-foreground max-w-md">
+                      Connect your wallet to start game.
+                    </p>
+                  </div>
+                  <WalletDropdown />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </AppHero>
+      </div>
+    )
+  }
+
+  const t3FlipAccountsQuery = useT3FlipAccountsQuery()
+  console.log('t3FlipAccountsQuery.data', t3FlipAccountsQuery.data)
+
   const [gameState, setGameState] = useState<GameState | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
