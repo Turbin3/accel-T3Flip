@@ -153,15 +153,26 @@ export default function GameFeature() {
       {/* Game Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-12 bg-gradient-to-b from-primary to-primary/50 rounded-full" />
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                Card Guessing Game
-              </h1>
-              <p className="text-muted-foreground mt-1 text-base md:text-lg">
-                Match the famous technologists with their cards
-              </p>
+          <div className="flex items-center gap-4">
+            <div className="relative flex-shrink-0">
+              <img 
+                src="/Money Crypto Sticker by BigBrains.gif" 
+                alt="Money Crypto Sticker" 
+                className="w-16 h-16 md:w-20 md:h-20 object-contain"
+              />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-12 bg-gradient-to-b from-primary to-primary/50 rounded-full hidden sm:block" />
+                <div>
+                  <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+                    Card Guessing Game
+                  </h1>
+                  <p className="text-muted-foreground mt-1 text-base md:text-lg">
+                    Match the famous technologists with their cards
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

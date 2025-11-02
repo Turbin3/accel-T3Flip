@@ -29,7 +29,17 @@ export function AppLayout({
         </main>
         <AppFooter />
       </div>
-      <Toaster closeButton position="top-right" richColors />
+      <Toaster 
+        closeButton 
+        position="bottom-right" 
+        richColors 
+        toastOptions={{
+          className: 'font-pixel',
+          style: {
+            fontFamily: 'BoldPixels, monospace',
+          },
+        }}
+      />
     </ThemeProvider>
   )
 }
