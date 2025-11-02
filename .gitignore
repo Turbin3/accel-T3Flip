@@ -54,6 +54,3 @@ test-ledger
 target/
 
 package-lock.json
-
-# Generated client code
-/anchor/src/client/js/generated/
