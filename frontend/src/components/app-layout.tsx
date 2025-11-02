@@ -19,7 +19,7 @@ export function AppLayout({
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <div className="flex flex-col min-h-screen bg-background">
         <AppHeader links={links} />
-        <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
+        <main className="flex-grow container mx-auto px-4 py-6 md:py-10 lg:py-12">
           <ClusterUiChecker>
             <AccountUiChecker />
           </ClusterUiChecker>
@@ -29,7 +29,17 @@ export function AppLayout({
         </main>
         <AppFooter />
       </div>
-      <Toaster closeButton position="top-right" richColors />
+      <Toaster 
+        closeButton 
+        position="bottom-right" 
+        richColors 
+        toastOptions={{
+          className: 'font-pixel',
+          style: {
+            fontFamily: 'BoldPixels, monospace',
+          },
+        }}
+      />
     </ThemeProvider>
   )
 }

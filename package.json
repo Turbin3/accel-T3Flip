@@ -2,7 +2,7 @@
   "name": "t3-flip",
   "scripts": {
     "anchor": "cd ./anchor && anchor",
-    "anchor-build": "cd ./anchor && anchor build",
+    "anchor-build": "cd ./anchor && anchor build && mkdir -p src/idl && cp target/idl/t3_flip.json src/idl/t3_flip.json",
     "anchor-localnet": "cd ./anchor && anchor localnet",
     "anchor-test": "cd ./anchor && anchor test",
     "build": "next build frontend",
