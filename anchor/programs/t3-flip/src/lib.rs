@@ -4,6 +4,7 @@ pub mod instructions;
 pub mod state;
 
 use anchor_lang::prelude::*;
+use ephemeral_rollups_sdk::anchor::ephemeral;
 
 pub use constants::*;
 pub use instructions::*;
@@ -11,8 +12,10 @@ pub use state::*;
 
 declare_id!("FnWAmKg7ryfnGU5sd9P4TTPhUhqhuL2oa6HPte6mTVmx");
 
+#[ephemeral]
 #[program]
 pub mod t3_flip {
+
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>, seed: u64) -> Result<()> {
