@@ -18,20 +18,14 @@ pub struct Guess<'info> {
 }
 
 impl Guess<'_> {
-    pub fn guess(&mut self, nft_id: u8) -> Result<()> {
+    pub fn guess(&mut self, nft_id: u8, index: u8) -> Result<()> {
         // match the nftid to any of the cards from the game_state
-        let mut found = false;
-        for card in self.game_state.cards.iter_mut() {
-            if *card == nft_id {
-                found = true;
-            }
-        }
-        // if matched add that nft id to rewards nft array
-        if found && self.game_state.nfts_rewards.len() < 5 {
+        let card = self.game_state.cards[index as usize];
+        if card == nft_id {
             self.game_state.nfts_rewards.push(nft_id);
+        } else {
+            self.game_state.cards.remove(index as usize);
         }
-
-        // if it's wrong remove that nft id from the game state cards array
 
         Ok(())
     }
