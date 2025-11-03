@@ -9,7 +9,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("ALBrSaQ89ntEGMDxj1idPdPVeHkFtfkjEkLpns1EvJTu");
+declare_id!("FFFmhjczAh6h4fNWGix78rzjxCRut1VG3a63Vqx8QCGr");
 
 #[program]
 pub mod t3_flip {

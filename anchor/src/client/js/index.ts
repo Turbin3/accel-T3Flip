@@ -6,7 +6,7 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from './generated/accounts';
-export * from './generated/errors';
-export * from './generated/instructions';
-export * from './generated/programs';
+export * from '../../t3flip/client/js/generated/accounts';
+export * from '../../t3flip/client/js/generated/errors';
+export * from '../../t3flip/client/js/generated/instructions';
+export * from '../../t3flip/client/js/generated/programs';

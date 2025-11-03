@@ -17,7 +17,7 @@ pub struct Guess<'info> {
 }
 
 impl Guess<'_> {
-    pub fn guess(&mut self, nft_id: u8) -> Result<()> {
+    pub fn guess(&mut self, _nft_id: u8) -> Result<()> {
         // match the nftid to any of the cards from the game_state
         // if matched add that nft id to rewards nft array
         // if it's wrong remove that nft id from the game state cards array

@@ -1,4 +1,5 @@
 [toolchain]
+anchor_version = "0.31.1"
 package_manager = "pnpm"
 
 [features]
@@ -6,7 +7,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-t3_flip = "ALBrSaQ89ntEGMDxj1idPdPVeHkFtfkjEkLpns1EvJTu"
+t3_flip = "FFFmhjczAh6h4fNWGix78rzjxCRut1VG3a63Vqx8QCGr"
 
 [registry]
 url = "https://api.apr.dev"
