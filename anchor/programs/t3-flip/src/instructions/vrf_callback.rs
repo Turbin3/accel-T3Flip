@@ -16,6 +16,7 @@ impl VrfCallback<'_> {
         // use the derive_number fn to get 5 rnd number from the above single rnd number
         let random_nft_ids = derive_numbers(rnd, 5, 0, 30); // min nft_id is 0 and max is 30(whatever the number of people is minus one)
         self.game_state.cards = random_nft_ids;
+        self.game_state.is_active = true;
         Ok(())
     }
 }
