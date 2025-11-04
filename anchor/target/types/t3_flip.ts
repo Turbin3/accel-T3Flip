@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/t3_flip.json`.
  */
 export type T3Flip = {
-  "address": "ALBrSaQ89ntEGMDxj1idPdPVeHkFtfkjEkLpns1EvJTu",
+  "address": "FFFmhjczAh6h4fNWGix78rzjxCRut1VG3a63Vqx8QCGr",
   "metadata": {
     "name": "t3Flip",
     "version": "0.1.0",
