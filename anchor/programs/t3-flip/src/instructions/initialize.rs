@@ -26,7 +26,7 @@ pub struct Initialize<'info> {
     /// CHECK: The oracle queue
     #[account(
         mut,
-        address = ephemeral_vrf_sdk::consts::DEFAULT_EPHEMERAL_QUEUE
+        address = ephemeral_vrf_sdk::consts::DEFAULT_QUEUE
     )]
     pub oracle_queue: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
@@ -47,7 +47,7 @@ impl Initialize<'_> {
             cards: vec![],
             nfts_rewards: vec![],
             life: 3,
-            is_active: true,
+            is_active: false
         });
 
         let ixn = create_request_randomness_ix(RequestRandomnessParams {
@@ -55,11 +55,18 @@ impl Initialize<'_> {
             oracle_queue: self.oracle_queue.key(),
             callback_program_id: crate::ID,
             callback_discriminator: instruction::VrfCallback::DISCRIMINATOR.to_vec(),
-            accounts_metas: Some(vec![SerializableAccountMeta {
-                pubkey: self.game_state.key(),
-                is_signer: false,
-                is_writable: true,
-            }]),
+            accounts_metas: Some(vec![
+                SerializableAccountMeta {
+                    pubkey: self.game_state.key(),
+                    is_signer: false,
+                    is_writable: true,
+                },
+                SerializableAccountMeta {
+                    pubkey: ephemeral_vrf_sdk::consts::VRF_PROGRAM_IDENTITY,
+                    is_signer: false,
+                    is_writable: false,
+                },
+            ]),
             caller_seed: [seed as u8; 32],
             ..Default::default()
         });

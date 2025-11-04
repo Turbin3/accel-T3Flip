@@ -3,7 +3,7 @@
 import { createCodamaConfig } from './src/create-codama-config.js'
 
 export default createCodamaConfig({
-  clientJs: 'anchor/src/t3flip/client/js/generated',
+  clientJs: 'anchor/src/client/js/generated',
   idl: 'target/idl/t3_flip.json',
 })
 

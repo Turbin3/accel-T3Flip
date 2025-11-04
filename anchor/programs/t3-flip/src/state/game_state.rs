@@ -10,9 +10,5 @@ pub struct GameState {
     pub nfts_rewards: Vec<u8>,
     pub life: u8,
     pub bump: u8,
-    pub is_active: bool,
+    pub is_active: bool
 }
-
-// impl Space for GameState {
-//     const INIT_SPACE: usize = 8 + 4 + 4 + 1 * 5 + 1 * 5 + 1 + 1 + 1;
-// }
