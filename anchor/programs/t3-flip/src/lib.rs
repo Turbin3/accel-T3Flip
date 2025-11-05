@@ -22,8 +22,8 @@ pub mod t3_flip {
         ctx.accounts.init_game(seed, &ctx.bumps)
     }
 
-    pub fn guess(ctx: Context<Guess>, nft_id: u8) -> Result<()> {
-        ctx.accounts.guess(nft_id)
+    pub fn guess(ctx: Context<Guess>, nft_id: u8, card_index: u8) -> Result<()> {
+        ctx.accounts.guess(nft_id, card_index)
     }
 
     pub fn game_over(ctx: Context<GameOver>) -> Result<()> {
