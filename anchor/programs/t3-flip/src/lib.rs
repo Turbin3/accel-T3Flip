@@ -1,3 +1,6 @@
+#![allow(unexpected_cfgs)]
+#![allow(deprecated)]
+
 pub mod constants;
 pub mod error;
 pub mod instructions;
@@ -10,7 +13,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("FnWAmKg7ryfnGU5sd9P4TTPhUhqhuL2oa6HPte6mTVmx");
+declare_id!("51ABGbo6FPrd5dAroNHkrx5LTZ1vkMAqBy7Efttm4e47");
 
 #[ephemeral]
 #[program]
@@ -30,8 +33,12 @@ pub mod t3_flip {
         ctx.accounts.guess(nft_id, card_index)
     }
 
+    pub fn init_tree(ctx: Context<InitTree>, max_depth: u32, max_buffer_size: u32) -> Result<()> {
+        ctx.accounts.init_tree(max_depth, max_buffer_size, &ctx.bumps)
+    }
+
     pub fn game_over(ctx: Context<GameOver>) -> Result<()> {
-        ctx.accounts.game_over()
+        ctx.accounts.game_over(&ctx.bumps)
     }
 
     pub fn vrf_callback(ctx: Context<VrfCallback>, rnd: [u8; 32]) -> Result<()> {
