@@ -18,6 +18,8 @@ import { WalletDropdown } from '@/components/wallet-dropdown'
 
 import { useT3FlipAccountsQuery } from '@/features/game/data-access/use-t3flip-accounts-query'
 import { useT3FlipInitializeMutation } from '@/features/game/data-access/use-t3flip-initialize-mutation'
+import { useGameSounds } from '@/hooks/useGameSounds'
+import { useAudioSettings } from '@/hooks/useAudioSettings'
 
 
 function shuffleArray<T>(array: T[]): T[] {
@@ -95,6 +97,12 @@ export default function GameFeature() {
   const t3FlipAccountsQuery = useT3FlipAccountsQuery()
   console.log('t3FlipAccountsQuery.data', t3FlipAccountsQuery.data)
 
+  const { soundEnabled, musicEnabled } = useAudioSettings()
+  const { playSoundEffect } = useGameSounds({
+    soundEnabled,
+    musicEnabled,
+  })
+
   const [gameState, setGameState] = useState<GameState | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -106,6 +114,7 @@ export default function GameFeature() {
   const handleStartGame = () => {
     if (!gameState) return
     
+    playSoundEffect('game-start')
     setGameState({
       ...gameState,
       isStarted: true,
@@ -116,6 +125,7 @@ export default function GameFeature() {
   const handleGuess = (personId: number) => {
     if (!gameState || isSubmitting) return
     
+    playSoundEffect('card-select')
     setIsSubmitting(true)
     
     // Simulate async operation
@@ -144,9 +154,15 @@ export default function GameFeature() {
           isWon: allGuessed,
         }
 
+        playSoundEffect('card-play')
         toast.success('Correct! Well done!')
+        
         if (allGuessed) {
+          playSoundEffect('win')
           toast.success('🎉 You won the game!')
+        } else {
+          // Moving to next card
+          playSoundEffect('new-turn')
         }
       } else {
         // Increment errors
@@ -160,8 +176,11 @@ export default function GameFeature() {
           isWon: false,
         }
 
+        playSoundEffect('error')
         toast.error('Wrong answer! Try again.')
+        
         if (gameLost) {
+          playSoundEffect('lose')
           toast.error('Game over! You ran out of lives.')
         }
       }
