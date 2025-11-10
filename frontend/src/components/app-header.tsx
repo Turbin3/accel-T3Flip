@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { ThemeSelect } from '@/components/theme-select'
 import { WalletDropdown } from '@/components/wallet-dropdown'
+import { AudioSettings } from '@/components/audio-settings'
 import { cn } from '@/lib/utils'
 
 const ClusterDropdown = dynamic(() => import('@/components/cluster-dropdown').then((m) => m.ClusterDropdown), {
@@ -25,10 +26,7 @@ export function AppHeader({ links = [] }: { links: { label: string; path: string
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-8">
-          <Link 
-            href="/" 
-            className="flex items-center space-x-2 group"
-          >
+          <Link href="/" className="flex items-center space-x-2 group">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/50 rounded-lg blur opacity-20 group-hover:opacity-30 transition-opacity" />
               <span className="relative text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
@@ -42,11 +40,9 @@ export function AppHeader({ links = [] }: { links: { label: string; path: string
                 key={path}
                 href={path}
                 className={cn(
-                  "relative px-4 py-2 text-sm font-medium transition-all rounded-md",
-                  "hover:bg-accent hover:text-accent-foreground",
-                  isActive(path)
-                    ? "text-foreground bg-accent"
-                    : "text-muted-foreground"
+                  'relative px-4 py-2 text-sm font-medium transition-all rounded-md',
+                  'hover:bg-accent hover:text-accent-foreground',
+                  isActive(path) ? 'text-foreground bg-accent' : 'text-muted-foreground',
                 )}
               >
                 {label}
@@ -60,24 +56,20 @@ export function AppHeader({ links = [] }: { links: { label: string; path: string
 
         <div className="flex items-center gap-3">
           <div className="hidden md:flex items-center gap-3">
+            <AudioSettings />
             <WalletDropdown />
             <ClusterDropdown />
             <ThemeSelect />
           </div>
 
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="md:hidden" 
-            onClick={() => setShowMenu(!showMenu)}
-          >
+          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setShowMenu(!showMenu)}>
             {showMenu ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
 
         {showMenu && (
           <>
-            <div 
+            <div
               className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
               onClick={() => setShowMenu(false)}
             />
@@ -90,11 +82,9 @@ export function AppHeader({ links = [] }: { links: { label: string; path: string
                       href={path}
                       onClick={() => setShowMenu(false)}
                       className={cn(
-                        "px-4 py-3 text-base font-medium rounded-lg transition-all",
-                        "hover:bg-accent hover:text-accent-foreground",
-                        isActive(path)
-                          ? "bg-accent text-foreground"
-                          : "text-muted-foreground"
+                        'px-4 py-3 text-base font-medium rounded-lg transition-all',
+                        'hover:bg-accent hover:text-accent-foreground',
+                        isActive(path) ? 'bg-accent text-foreground' : 'text-muted-foreground',
                       )}
                     >
                       {label}
@@ -102,6 +92,10 @@ export function AppHeader({ links = [] }: { links: { label: string; path: string
                   ))}
                 </nav>
                 <div className="flex flex-col gap-3 pt-4 border-t">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Audio</span>
+                    <AudioSettings />
+                  </div>
                   <WalletDropdown />
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Network</span>

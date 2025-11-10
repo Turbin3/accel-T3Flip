@@ -1,0 +1,12 @@
+This directory will contain sound effects for the game.
+Required sounds:
+
+- card-select.mp3
+- card-play.mp3
+- end-turn.mp3
+- game-start.mp3
+- game-over.mp3
+- error.mp3
+- new-turn.mp3
+- win.mp3
+- lose.mp3
