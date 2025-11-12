@@ -20,16 +20,23 @@ const VRF_PROGRAM_ID = new anchor.web3.PublicKey("Vrf1RNUjXmQGjmQrQLvJHs9SNkvDJE
 
 export const generateInitData = () => {
   return {
-    seed: new BN(67),
+    seed: new BN(53),
   };
 };
 
-describe("t3-flip init", () => {
+const ER_VALIDATOR = new anchor.web3.PublicKey("MAS1Dt9qreoRMQ14YQuhg8UTZMMzDdKhmkZMECCzk57");
+
+describe("t3-flip", () => {
   // 1. Standard Anchor provider (for base layer operations like fetching wallet balance)
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
   const program = anchor.workspace.t3Flip as Program<T3Flip>;
+  const providerEphemeralRollup = new anchor.AnchorProvider(
+    new anchor.web3.Connection("https://devnet-as.magicblock.app/", {
+      wsEndpoint: "wss://devnet.magicblock.app/",
+    }), provider.wallet);
+  const ephemeralProgram = new Program<T3Flip>(program.idl, providerEphemeralRollup);
 
   // Helper function to calculate the PDA
   const getGameStatePDA = (seed: anchor.BN, playerPk: anchor.web3.PublicKey) => {
@@ -49,6 +56,7 @@ describe("t3-flip init", () => {
     const [gameStatePk] = getGameStatePDA(initData.seed, playerPk);
 
     console.log("Game State PDA:", gameStatePk.toBase58());
+    console.log("programId:", program.programId);
 
     // --- SANITY CHECK: VERIFY ORACLE QUEUE OWNER ---
     const oracleQueueAccount = await program.provider.connection.getAccountInfo(ORACLE_QUEUE_ADDRESS);
@@ -82,6 +90,7 @@ describe("t3-flip init", () => {
       .initialize(initData.seed)
       .accountsPartial({
         player: playerPk,
+        //@ts-ignore
         gameState: gameStatePk,
         oracleQueue: ORACLE_QUEUE_ADDRESS,
         systemProgram: anchor.web3.SystemProgram.programId,
@@ -200,6 +209,125 @@ describe("t3-flip init", () => {
       console.log("Transaction Successful, tx:", gameOverTx);
     });
 
+  it("is delegated", async () => {
+    const initData = generateInitData();
+    const playerPk = provider.wallet.publicKey;
+    const [gameStatePk] = getGameStatePDA(initData.seed, playerPk);
+
+    let gameStateAccount = await program.account.gameState.fetch(gameStatePk);
+    assert(gameStateAccount.isActive, "Game state should be active");
+    let gameStateInfo = await program.provider.connection.getAccountInfo(gameStatePk);
+    assert(gameStateInfo.owner.toBase58() === program.programId.toBase58(), "Game state owner should be the program");
+
+    let tx = await program.methods.delegateGameState().accounts({
+      player: playerPk,
+      validator: ER_VALIDATOR,
+      //@ts-ignore
+      gameState: gameStatePk
+    }).rpc();
+    console.log("✅ Delegate Game State successfull.");
+
+    let erGameStateInfo = await provider.connection.getAccountInfo(gameStatePk);
+    console.log("erGameStateInfo:", erGameStateInfo);
+    assert(erGameStateInfo.owner.toString().toLowerCase().startsWith("del"), "er game state info owner should be delegate program");
+    let gameState = program.coder.accounts.decode("gameState", erGameStateInfo.data);
+    console.log("gameState:", gameState);
+  })
+
+  it("is guessed wrong", async () => {
+    const initData = generateInitData();
+    const playerPk = provider.wallet.publicKey;
+    const [gameStatePk] = getGameStatePDA(initData.seed, playerPk);
+    //Cards: [ 2, 24, 9, 15, 28 ]
+    let tx = await ephemeralProgram.methods.guess(12, 0).accounts({
+      player: playerPk,
+      //@ts-ignore
+      gameState: gameStatePk
+    }).rpc();
+    console.log("guess transaction successful with tx: ", tx);
+
+    let gameStateAccount = await ephemeralProgram.account.gameState.fetch(gameStatePk);
+    console.log("gamestateAccount:", gameStateAccount);
+    console.log("Cards:", Array.from(gameStateAccount.cards));
+    console.log("nfts:", Array.from(gameStateAccount.nftsRewards));
+    console.log("gameId:", gameStateAccount.currentGameId.toString());
+    assert(gameStateAccount.life == 2, "life in game state should be matched");
+    assert(gameStateAccount.nftsRewards.length == 0, "nft reward should be as expected");
+  })
+
+  it("duplicate guess", async () => {
+    const initData = generateInitData();
+    const playerPk = provider.wallet.publicKey;
+    const [gameStatePk] = getGameStatePDA(initData.seed, playerPk);
+    //Cards: [ 2, 24, 9, 15, 28 ]
+    try {
+      let tx = await ephemeralProgram.methods.guess(12, 0).accounts({
+        player: playerPk,
+        //@ts-ignore
+        gameState: gameStatePk
+      }).rpc();
+      console.log("guess transaction successful with tx: ", tx);
+    } catch (error) {
+      const anchorErr = error as anchor.AnchorError;
+      expect(anchorErr.error.errorCode?.code).to.equal("DuplicateGuess");
+    }
+  })
+
+  it("is guessed right", async () => {
+    const initData = generateInitData();
+    const playerPk = provider.wallet.publicKey;
+    const [gameStatePk] = getGameStatePDA(initData.seed, playerPk);
+    //Cards: [ 255, 255, 9, 15, 28 ]
+    let tx = await ephemeralProgram.methods.guess(9, 2).accounts({
+      player: playerPk,
+      //@ts-ignore
+      gameState: gameStatePk
+    }).rpc();
+    console.log("guess transaction successful with tx: ", tx);
+
+    let gameStateAccount = await ephemeralProgram.account.gameState.fetch(gameStatePk);
+    console.log("gamestateAccount:", gameStateAccount);
+    console.log("Cards:", Array.from(gameStateAccount.cards));
+    console.log("nfts:", Array.from(gameStateAccount.nftsRewards));
+    console.log("gameId:", gameStateAccount.currentGameId.toString());
+    assert(gameStateAccount.life == 1, "life in game state should be matched");
+    assert(gameStateAccount.nftsRewards.length == 1, "nft reward should be as expected");
+  })
+
+  it.only("no life guess", async () => {
+    const initData = generateInitData();
+    const playerPk = provider.wallet.publicKey;
+    const [gameStatePk] = getGameStatePDA(initData.seed, playerPk);
+
+    let gameStateAccount = await ephemeralProgram.account.gameState.fetch(gameStatePk);
+    let i = 0;
+    while (gameStateAccount.life > 0) {
+      try {
+        await ephemeralProgram.methods.guess(12, i).accounts({
+          player: playerPk,
+          //@ts-ignore
+          gameState: gameStatePk
+        }).rpc();
+      } catch (error) {
+        const anchorErr = error as anchor.AnchorError;
+        console.log(anchorErr.error.errorCode?.code);
+      }
+      gameStateAccount = await ephemeralProgram.account.gameState.fetch(gameStatePk);
+      i = (i + 1) % 5; //runs until life is 0
+    }
+
+    //life is 0 now
+    try {
+      await ephemeralProgram.methods.guess(12, i).accounts({
+        player: playerPk,
+        //@ts-ignore
+        gameState: gameStatePk
+      }).rpc();
+    } catch (error) {
+      const anchorErr = error as anchor.AnchorError;
+      expect(anchorErr.error.errorCode?.code).to.equal("NoLife");
+    }
+  })
 });
 
 

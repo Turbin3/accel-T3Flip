@@ -13,7 +13,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("51ABGbo6FPrd5dAroNHkrx5LTZ1vkMAqBy7Efttm4e47");
+declare_id!("3cHmZgUdSbe2zTn1PTvAp286txZrY6vGnb6Ao4dauw2c");
 
 #[ephemeral]
 #[program]
@@ -30,7 +30,7 @@ pub mod t3_flip {
     }
 
     pub fn guess(ctx: Context<Guess>, nft_id: u8, card_index: u8) -> Result<()> {
-        ctx.accounts.guess(nft_id, card_index)
+        ctx.accounts.guess(nft_id, card_index as usize)
     }
 
     pub fn init_tree(ctx: Context<InitTree>, max_depth: u32, max_buffer_size: u32) -> Result<()> {
