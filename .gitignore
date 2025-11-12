@@ -64,3 +64,4 @@ anchor/target/*
 package-lock.json
 
 /anchor/src/client/js/generated/
+/anchor/.pnpm-store

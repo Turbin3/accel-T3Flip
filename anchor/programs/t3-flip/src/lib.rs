@@ -1,3 +1,6 @@
+#![allow(unexpected_cfgs)]
+#![allow(deprecated)]
+
 pub mod constants;
 pub mod error;
 pub mod instructions;
@@ -30,8 +33,16 @@ pub mod t3_flip {
         ctx.accounts.guess(nft_id, card_index as usize)
     }
 
+    pub fn init_tree(ctx: Context<InitTree>, max_depth: u32, max_buffer_size: u32) -> Result<()> {
+        ctx.accounts.init_tree(max_depth, max_buffer_size, &ctx.bumps)
+    }
+
     pub fn game_over(ctx: Context<GameOver>) -> Result<()> {
-        ctx.accounts.game_over()
+        ctx.accounts.game_over(&ctx.bumps)
+    }
+
+    pub fn undelegate_game_state(ctx: Context<Undelegate>) -> Result<()> {
+        ctx.accounts.undelegate()
     }
 
     pub fn vrf_callback(ctx: Context<VrfCallback>, rnd: [u8; 32]) -> Result<()> {
