@@ -16,14 +16,14 @@ describe("NFT tree", () => {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = dirname(__filename);
 
-  xit("Create NFT collection", async () => {
+  it("Create NFT collection", async () => {
     const provider = anchor.AnchorProvider.env();
     anchor.setProvider(provider);
 
     console.log(":: Creating Core NFT Collection ::");
     console.log("Wallet:", provider.wallet.publicKey.toString());
 
-    const programId = new PublicKey("51ABGbo6FPrd5dAroNHkrx5LTZ1vkMAqBy7Efttm4e47");
+    const programId = new PublicKey("CXedySfR5HryxvbcWHyD365cKpujubD96YQ2781LTZNd");
 
     // Collection authority = program's PDA
     const [collectionAuthority, bump] = PublicKey.findProgramAddressSync(
@@ -53,6 +53,7 @@ describe("NFT tree", () => {
     // Create the collection
     await createCollection(umi, {
       collection: collectionKeypair,
+      updateAuthority: publicKey(collectionAuthority.toString()),
       name: "Turbin3 Flip",
       uri: "https://your-metadata-uri.com/collection.json", // TODO: Update with actual URI
       plugins: [

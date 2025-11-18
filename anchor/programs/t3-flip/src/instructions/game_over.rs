@@ -4,8 +4,8 @@ use mpl_bubblegum::types::{
     MetadataArgsV2, TokenStandard
 };
 use mpl_bubblegum::ID as BUBBLEGUM_ID;
-use spl_account_compression::ID as SPL_ACCOUNT_COMPRESSION_ID;
-use spl_noop::ID as SPL_NOOP_ID;
+use mpl_account_compression::ID as MPL_ACCOUNT_COMPRESSION_ID;
+use mpl_noop::ID as MPL_NOOP_ID;
 use mpl_core::ID as MPL_CORE_ID;
 
 use crate::GameState;
@@ -48,9 +48,12 @@ pub struct GameOver<'info> {
     /// CHECK: Merkle Tree account that will be checked by the Bubblegum Program
     #[account(mut)]
     pub merkle_tree: UncheckedAccount<'info>,
+
+    /// CHECK: MPL Core CPI Signer account that will be checked by the Bubblegum Program
+    pub mpl_core_cpi_signer: UncheckedAccount<'info>,
     
     /// CHECK: SPL NOOP Program checked by the corresponding address
-    #[account(address = SPL_NOOP_ID)]
+    #[account(address = Pubkey::from_str_const(&MPL_NOOP_ID.to_string()))]
     pub log_wrapper: UncheckedAccount<'info>,
     
     /// CHECK: Bubblegum Program checked by the corresponding address
@@ -58,7 +61,7 @@ pub struct GameOver<'info> {
     pub bubblegum_program: UncheckedAccount<'info>,
     
     /// CHECK: SPL Account Compression Program checked by the corresponding address
-    #[account(address = SPL_ACCOUNT_COMPRESSION_ID)]
+    #[account(address = Pubkey::from_str_const(&MPL_ACCOUNT_COMPRESSION_ID.to_string()))]
     pub compression_program: UncheckedAccount<'info>,
 
     /// CHECK: This is the ID of the Metaplex Core program
@@ -78,7 +81,7 @@ impl GameOver<'_> {
 
         let tree_seeds: &[&[u8]] = &[b"tree-authority", &[bumps.tree_authority]];
 
-        let signer_seeds: &[&[&[u8]]] = &[collection_seeds, tree_seeds];
+        let signer_seeds: &[&[&[u8]]] = &[tree_seeds, collection_seeds];
 
         // if rewards is not empty we mint the nfts to the player
         for _nft_id in self.game_state.nfts_rewards.iter() {
@@ -96,8 +99,8 @@ impl GameOver<'_> {
             .leaf_owner(&self.player.to_account_info())
             .leaf_delegate(None)
             .merkle_tree(&self.merkle_tree.to_account_info())
+            .mpl_core_cpi_signer(Some(&self.mpl_core_cpi_signer.to_account_info()))
             .core_collection(Some(&self.core_collection.to_account_info()))
-            .mpl_core_cpi_signer(Some(&self.collection_authority.to_account_info()))
             .log_wrapper(&self.log_wrapper.to_account_info())
             .compression_program(&self.compression_program.to_account_info())
             .mpl_core_program(&self.mpl_core_program.to_account_info())

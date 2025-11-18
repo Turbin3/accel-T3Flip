@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
-use mpl_bubblegum::{ID as BUBBLEGUM_ID, instructions::CreateTreeConfigCpiBuilder};
-use spl_account_compression::ID as SPL_ACCOUNT_COMPRESSION_ID;
-use spl_noop::ID as SPL_NOOP_ID;
+use mpl_bubblegum::{ID as BUBBLEGUM_ID, instructions::CreateTreeConfigV2CpiBuilder};
+use mpl_account_compression::ID as MPL_ACCOUNT_COMPRESSION_ID;
+use mpl_noop::ID as MPL_NOOP_ID;
 
 #[derive(Accounts)]
 pub struct InitTree<'info> {
@@ -20,10 +20,10 @@ pub struct InitTree<'info> {
     #[account(mut)]
     pub merkle_tree: UncheckedAccount<'info>,
     /// CHECK: SPL NOOP Program checked by the corresponding address
-    #[account(address = SPL_NOOP_ID)]
+    #[account(address = Pubkey::from_str_const(&MPL_NOOP_ID.to_string()))]
     pub log_wrapper: UncheckedAccount<'info>,
     /// CHECK: SPL Account Compression Program checked by the corresponding address
-    #[account(address = SPL_ACCOUNT_COMPRESSION_ID)]
+    #[account(address = Pubkey::from_str_const(&MPL_ACCOUNT_COMPRESSION_ID.to_string()))]
     pub compression_program: UncheckedAccount<'info>,
     /// CHECK: Bubblegum Program checked by the corresponding address
     #[account(address = BUBBLEGUM_ID)]
@@ -54,11 +54,11 @@ impl<'info> InitTree<'info> {
         let system_program = &self.system_program.to_account_info();
 
         // CPI call to create the tree config
-        CreateTreeConfigCpiBuilder::new(bubblegum_program)
+        CreateTreeConfigV2CpiBuilder::new(bubblegum_program)
             .tree_config(tree_config)
             .merkle_tree(merkle_tree)
             .payer(payer)
-            .tree_creator(tree_creator)
+            .tree_creator(Some(tree_creator))
             .log_wrapper(log_wrapper)
             .compression_program(compression_program)
             .system_program(system_program)
