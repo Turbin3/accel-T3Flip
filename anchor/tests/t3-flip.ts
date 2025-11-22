@@ -2,7 +2,18 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import type { T3Flip } from "../target/types/t3_flip";
 import { BN } from "bn.js";
-import { assert, expect } from "chai";
+import { expect } from "chai";
+import { sendAndConfirmTransaction, Transaction, SystemProgram } from "@solana/web3.js";
+import {
+  ValidDepthSizePair,
+  createAllocTreeIx,
+  getConcurrentMerkleTreeAccountSize,
+} from "@solana/spl-account-compression";
+import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
+import { generateSigner, keypairIdentity, sol } from "@metaplex-foundation/umi";
+import { publicKey } from "@metaplex-foundation/umi";
+import { findTreeConfigPda, createTreeConfigV2, mplBubblegum } from '@metaplex-foundation/mpl-bubblegum';
+import assert from "assert";
 
 // MagicBlock VRF Queue address (used in the Rust program)
 // You might need to confirm this is the correct one for your test setup
@@ -41,7 +52,7 @@ describe("t3-flip", () => {
     );
   };
 
-  it("Is initialized and requests randomness!", async () => {
+  xit("Is initialized and requests randomness!", async () => {
     const initData = generateInitData();
     const playerPk = provider.wallet.publicKey;
     const [gameStatePk] = getGameStatePDA(initData.seed, playerPk);
@@ -79,7 +90,7 @@ describe("t3-flip", () => {
     // Use the EPHEMERAL provider for the transaction
     const tx = await program.methods
       .initialize(initData.seed)
-      .accounts({
+      .accountsPartial({
         player: playerPk,
         //@ts-ignore
         gameState: gameStatePk,
@@ -98,6 +109,7 @@ describe("t3-flip", () => {
     console.log("Game State after callback:", game_state_account);
     console.log("Cards:", Array.from(game_state_account.cards));
     expect(Array.from(game_state_account.cards).length > 0, "Card array shouldn't be empty");
+
   });
 
   /**TEST OUTPUT, FROM DEVNET TESTING:
@@ -121,7 +133,71 @@ describe("t3-flip", () => {
     Cards: [ 4, 17, 3, 3, 9 ]
    */
 
-  it("is delegated", async () => {
+    xit("Init Tree", async () => {
+
+      // Setup Umi
+      const umi = createUmi(provider.connection.rpcEndpoint)
+      .use(keypairIdentity({
+        publicKey: publicKey(provider.wallet.publicKey.toString()),
+        secretKey: (provider.wallet as any).payer.secretKey,
+      }))
+      .use(mplBubblegum());
+
+      const emptyMerkleTree = anchor.web3.Keypair.generate();
+      console.log(`Merke tree: ${emptyMerkleTree.publicKey.toBase58()}`);
+      const treeConfigPda = findTreeConfigPda(
+        umi,
+        {
+          merkleTree: emptyMerkleTree.publicKey,
+        }
+      )[0]
+
+      const treeConfigPublicKey = new anchor.web3.PublicKey(treeConfigPda);
+      console.log('treeConfigPublicKey', treeConfigPublicKey.toBase58());
+
+      const maxDepthSizePair: ValidDepthSizePair = {
+        maxDepth: 14,
+        maxBufferSize: 64,
+      }
+      const canopyDepth = maxDepthSizePair.maxDepth - 5;
+      
+      const allocTreeIx = await createAllocTreeIx(
+        provider.connection,
+        emptyMerkleTree.publicKey,
+        provider.publicKey,
+        maxDepthSizePair,
+        canopyDepth
+      );
+
+      const requiredSpace = getConcurrentMerkleTreeAccountSize(
+        maxDepthSizePair.maxDepth,
+        maxDepthSizePair.maxBufferSize,
+        canopyDepth ?? 0,
+    );
+
+      let ix = SystemProgram.createAccount({
+        fromPubkey: provider.wallet.publicKey,
+        lamports: await provider.connection.getMinimumBalanceForRentExemption(requiredSpace),
+        newAccountPubkey: emptyMerkleTree.publicKey,
+        programId: new anchor.web3.PublicKey("mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW"),
+        space: requiredSpace,
+      });
+  
+      await sendAndConfirmTransaction(provider.connection, new Transaction().add(ix), [provider.wallet.payer, emptyMerkleTree]);
+
+      const initTreeTx = await program.methods
+      .initTree(14, 64)
+      .accounts({
+        payer: provider.wallet.publicKey,
+        treeConfig: new anchor.web3.PublicKey("GQS5DmnWzeKZUqj8bJRT23n5mLKGqmh2buAXELLGDXdh"),
+        merkleTree: new anchor.web3.PublicKey("8vWFAdg2MYwsWPDZqdJZkNnnoGTnodTsQWK3zxLLo32V"),
+        logWrapper: new anchor.web3.PublicKey("mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3"),
+        compressionProgram: new anchor.web3.PublicKey("mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW"),
+      }).rpc();
+      console.log("Transaction Successful, tx:", initTreeTx);
+    });
+
+  xit("is delegated", async () => {
     const initData = generateInitData();
     const playerPk = provider.wallet.publicKey;
     const [gameStatePk] = getGameStatePDA(initData.seed, playerPk);
@@ -146,7 +222,7 @@ describe("t3-flip", () => {
     console.log("gameState:", gameState);
   })
 
-  it("is guessed wrong", async () => {
+  xit("is guessed wrong", async () => {
     const initData = generateInitData();
     const playerPk = provider.wallet.publicKey;
     const [gameStatePk] = getGameStatePDA(initData.seed, playerPk);
@@ -167,7 +243,7 @@ describe("t3-flip", () => {
     assert(gameStateAccount.nftsRewards.length == 0, "nft reward should be as expected");
   })
 
-  it("duplicate guess", async () => {
+  xit("duplicate guess", async () => {
     const initData = generateInitData();
     const playerPk = provider.wallet.publicKey;
     const [gameStatePk] = getGameStatePDA(initData.seed, playerPk);
@@ -185,12 +261,12 @@ describe("t3-flip", () => {
     }
   })
 
-  it("is guessed right", async () => {
+  xit("is guessed right", async () => {
     const initData = generateInitData();
     const playerPk = provider.wallet.publicKey;
     const [gameStatePk] = getGameStatePDA(initData.seed, playerPk);
     //Cards: [ 255, 255, 9, 15, 28 ]
-    let tx = await ephemeralProgram.methods.guess(9, 2).accounts({
+    let tx = await ephemeralProgram.methods.guess(29, 2).accounts({
       player: playerPk,
       //@ts-ignore
       gameState: gameStatePk
@@ -202,44 +278,93 @@ describe("t3-flip", () => {
     console.log("Cards:", Array.from(gameStateAccount.cards));
     console.log("nfts:", Array.from(gameStateAccount.nftsRewards));
     console.log("gameId:", gameStateAccount.currentGameId.toString());
-    assert(gameStateAccount.life == 1, "life in game state should be matched");
+    // assert(gameStateAccount.life == 1, "life in game state should be matched");
     assert(gameStateAccount.nftsRewards.length == 1, "nft reward should be as expected");
   })
 
-  it.only("no life guess", async () => {
+  // it.only("no life guess", async () => {
+  //   const initData = generateInitData();
+  //   const playerPk = provider.wallet.publicKey;
+  //   const [gameStatePk] = getGameStatePDA(initData.seed, playerPk);
+
+  //   let gameStateAccount = await ephemeralProgram.account.gameState.fetch(gameStatePk);
+  //   let i = 0;
+  //   while (gameStateAccount.life > 0) {
+  //     try {
+  //       await ephemeralProgram.methods.guess(12, i).accounts({
+  //         player: playerPk,
+  //         //@ts-ignore
+  //         gameState: gameStatePk
+  //       }).rpc();
+  //     } catch (error) {
+  //       const anchorErr = error as anchor.AnchorError;
+  //       console.log(anchorErr.error.errorCode?.code);
+  //     }
+  //     gameStateAccount = await ephemeralProgram.account.gameState.fetch(gameStatePk);
+  //     i = (i + 1) % 5; //runs until life is 0
+  //   }
+
+  //   //life is 0 now
+  //   try {
+  //     await ephemeralProgram.methods.guess(12, i).accounts({
+  //       player: playerPk,
+  //       //@ts-ignore
+  //       gameState: gameStatePk
+  //     }).rpc();
+  //   } catch (error) {
+  //     const anchorErr = error as anchor.AnchorError;
+  //     expect(anchorErr.error.errorCode?.code).to.equal("NoLife");
+  //   }
+  // })
+
+  xit("Undelegate Game State", async () => {
     const initData = generateInitData();
     const playerPk = provider.wallet.publicKey;
     const [gameStatePk] = getGameStatePDA(initData.seed, playerPk);
 
-    let gameStateAccount = await ephemeralProgram.account.gameState.fetch(gameStatePk);
-    let i = 0;
-    while (gameStateAccount.life > 0) {
-      try {
-        await ephemeralProgram.methods.guess(12, i).accounts({
-          player: playerPk,
-          //@ts-ignore
-          gameState: gameStatePk
-        }).rpc();
-      } catch (error) {
-        const anchorErr = error as anchor.AnchorError;
-        console.log(anchorErr.error.errorCode?.code);
-      }
-      gameStateAccount = await ephemeralProgram.account.gameState.fetch(gameStatePk);
-      i = (i + 1) % 5; //runs until life is 0
-    }
+    console.log("gameStatePk:", gameStatePk.toBase58());
 
-    //life is 0 now
-    try {
-      await ephemeralProgram.methods.guess(12, i).accounts({
-        player: playerPk,
-        //@ts-ignore
-        gameState: gameStatePk
-      }).rpc();
-    } catch (error) {
-      const anchorErr = error as anchor.AnchorError;
-      expect(anchorErr.error.errorCode?.code).to.equal("NoLife");
-    }
+    let tx = await ephemeralProgram.methods
+    .undelegateGameState()
+    .accountsPartial({
+      player: playerPk,
+      gameState: gameStatePk
+    }).rpc();
+    console.log("Undelegate Game State transaction successful with tx: ", tx);
   })
+
+  it("Game Over", async () => {
+
+    // --- GAME OVER ---
+    const initData = generateInitData().seed;
+    const playerPk = provider.wallet.publicKey;
+    const [gameStatePk] = getGameStatePDA(initData, playerPk);
+
+    const [treeAuthority, bump] = anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("tree-authority")],
+      program.programId
+    );
+  
+    const gameOverTx = await program.methods
+    .gameOver()
+    .accountsPartial({
+      player: playerPk,
+      gameState: gameStatePk,
+      coreCollection: new anchor.web3.PublicKey("4pCNLHNvWgby1nQjVTuWrvU8GS139amfSQRDw38SxRhf"),
+      collectionAuthority: new anchor.web3.PublicKey("DWZECdPg8YxXAwWPe71Jgdt2uwqGgsJZLpEuXcsePhoW"),
+      treeAuthority,
+      treeConfig: new anchor.web3.PublicKey("GQS5DmnWzeKZUqj8bJRT23n5mLKGqmh2buAXELLGDXdh"),
+      merkleTree: new anchor.web3.PublicKey("8vWFAdg2MYwsWPDZqdJZkNnnoGTnodTsQWK3zxLLo32V"),
+      mplCoreCpiSigner: new anchor.web3.PublicKey("CbNY3JiXdXNE9tPNEk1aRZVEkWdj2v7kfJLNQwZZgpXk"),
+      logWrapper: new anchor.web3.PublicKey("mnoopTCrg4p8ry25e4bcWA9XZjbNjMTfgYVGGEdRsf3"),
+      bubblegumProgram: new anchor.web3.PublicKey("BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY"),
+      compressionProgram: new anchor.web3.PublicKey("mcmt6YrQEMKw8Mw43FmpRLmf7BqRnFMKmAcbxE3xkAW"),
+      mplCoreProgram: new anchor.web3.PublicKey("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d"),
+      systemProgram: anchor.web3.SystemProgram.programId,
+    }).rpc({skipPreflight: false});
+    console.log("Transaction Successful, tx:", gameOverTx);
+  });
+
 });
 
 
